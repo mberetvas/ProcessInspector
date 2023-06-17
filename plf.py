@@ -1,18 +1,22 @@
-import sys
-import os
+import psutil
+import time
+import argparse
 import csv
 import json
 import xml.etree.ElementTree as ET
-import psutil
-import argparse
+
+
+PROCESS_FIELDS = ['name', 'exe', 'create_time']
+PROCESS_PARENT_FIELDS = ['name', 'exe']
 
 
 def get_process_locations():
     process_locations = []
-    for proc in psutil.process_iter(['name', 'exe']):
+    for proc in psutil.process_iter(PROCESS_FIELDS):
         try:
             process_name = proc.info['name']
             process_exe = proc.info['exe']
+            create_time = proc.info['create_time']
             parent_proc = proc.parent()  # get the parent process
             if parent_proc:  # check if the parent process exists
                 parent_name = parent_proc.name()  # get the parent name
@@ -21,80 +25,88 @@ def get_process_locations():
                 parent_name = None
                 parent_exe = None
             process_locations.append({
-                'Process Name': process_name,
-                'Process Location': process_exe,
-                'Parent Name': parent_name,
-                'Parent Location': parent_exe
+                'name': process_name,
+                'exe': process_exe,
+                'create_time': create_time,
+                'parent': {
+                    'name': parent_name,
+                    'exe': parent_exe
+                }
             })
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return process_locations
 
 
-def save_process_locations(file_path, output_format):
-    process_locations = get_process_locations()
-    if output_format == 'csv':
-        save_as_csv(file_path, process_locations)
-    elif output_format == 'json':
-        save_as_json(file_path, process_locations)
-    elif output_format == 'xml':
-        save_as_xml(file_path, process_locations)
-    else:
-        print("Invalid output format. Please choose 'csv', 'json', or 'xml'.")
-
-
-def save_as_csv(file_path, process_locations):
-    fieldnames = ['Process Name', 'Process Location',
-                  'Parent Name', 'Parent Location']
+def save_process_locations_to_csv(file_path, process_locations):
     with open(file_path, 'w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=[
+                                'Name', 'Executable', 'Creation Time', 'Parent Name', 'Parent Executable'])
         writer.writeheader()
-        writer.writerows(process_locations)
+        for process in process_locations:
+            writer.writerow({
+                'Name': process['name'],
+                'Executable': process['exe'],
+                'Creation Time': time.ctime(process['create_time']),
+                'Parent Name': process['parent']['name'],
+                'Parent Executable': process['parent']['exe']
+            })
 
 
-def save_as_json(file_path, process_locations):
+def save_process_locations_to_json(file_path, process_locations):
     with open(file_path, 'w') as file:
         json.dump(process_locations, file, indent=4)
 
 
-def save_as_xml(file_path, process_locations):
+def save_process_locations_to_xml(file_path, process_locations):
     root = ET.Element('Processes')
     for process in process_locations:
-        process_elem = ET.SubElement(root, 'Process')
-        for key, value in process.items():
-            attr_elem = ET.SubElement(process_elem, key.replace(' ', '_'))
-            attr_elem.text = str(value)
+        proc_elem = ET.SubElement(root, 'Process')
+        name_elem = ET.SubElement(proc_elem, 'Name')
+        name_elem.text = process['name']
+        exe_elem = ET.SubElement(proc_elem, 'Executable')
+        exe_elem.text = process['exe']
+        create_time_elem = ET.SubElement(proc_elem, 'CreationTime')
+        create_time_elem.text = time.ctime(process['create_time'])
+        parent_elem = ET.SubElement(proc_elem, 'Parent')
+        parent_name_elem = ET.SubElement(parent_elem, 'Name')
+        parent_name_elem.text = process['parent']['name']
+        parent_exe_elem = ET.SubElement(parent_elem, 'Executable')
+        parent_exe_elem.text = process['parent']['exe']
+
     tree = ET.ElementTree(root)
     tree.write(file_path, encoding='utf-8', xml_declaration=True)
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-        prog='plf.py', description='Process Location Finder')
-    parser.add_argument('-o', '--output-folder',
-                        metavar='<output_folder>', help='Specify the output folder')
-    parser.add_argument('-f', '--format', metavar='<format>',
-                        help="Specify the output format: 'csv', 'json', or 'xml'")
-    return parser.parse_args()
+def main(output_folder, format, interval, total_time):
+    start_time = time.time()
+    end_time = start_time + total_time
+
+    process_locations = []
+    while time.time() < end_time:
+        process_locations.extend(get_process_locations())
+        time.sleep(interval)
+
+    if format == 'csv':
+        file_path = f"{output_folder}/running_process_locations.csv"
+        save_process_locations_to_csv(file_path, process_locations)
+    elif format == 'json':
+        file_path = f"{output_folder}/running_process_locations.json"
+        save_process_locations_to_json(file_path, process_locations)
+    elif format == 'xml':
+        file_path = f"{output_folder}/running_process_locations.xml"
+        save_process_locations_to_xml(file_path, process_locations)
 
 
-def print_help(parser):
-    parser.print_help()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process Location Finder')
+    parser.add_argument('-o', '--output', default='.', help='Output folder')
+    parser.add_argument(
+        '-f', '--format', choices=['csv', 'json', 'xml'], default='csv', help='Output format')
+    parser.add_argument('-t', '--interval', type=int,
+                        default=60, help='Time interval in seconds')
+    parser.add_argument('-T', '--total-time', type=int,
+                        default=600, help='Total time in seconds')
 
-
-# Usage example
-args = parse_arguments()
-
-if args.format:
-    output_format = args.format.lower()
-    if output_format not in ['csv', 'json', 'xml']:
-        print("Invalid output format. Please choose 'csv', 'json', or 'xml'.")
-        sys.exit(1)
-else:
-    print("Output format is required. Please specify 'csv', 'json', or 'xml'.")
-    sys.exit(1)
-
-output_folder = args.output_folder if args.output_folder else os.getcwd()
-file_name = f'running_process_locations.{output_format}'
-file_path = os.path.join(output_folder, file_name)
-save_process_locations(file_path, output_format)
+    args = parser.parse_args()
+    main(args.output, args.format, args.interval, args.total_time)
