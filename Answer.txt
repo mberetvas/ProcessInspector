@@ -1,0 +1,39 @@
+Process Location Finder
+This script allows you to retrieve a list of running processes on your system along with their corresponding file locations and their parent processes. It can be useful for analyzing and understanding the processes running on your computer and their relationships.
+Getting Started
+Prerequisites
+Make sure you have Python 3.x installed on your system.
+Installation
+ - Clone this repository or download the script file process_location_finder.py.
+
+ - Install the required dependencies by running the following command:
+
+[shell]
+pip install psutil
+
+Usage
+ - Open a terminal or command prompt.
+
+ - Navigate to the directory where the script file is located.
+
+ - Run the script using the following command:
+
+[shell]
+python process_location_finder.py
+
+The script will retrieve the list of running processes and their file locations and their parent processes, and save them to a text file named running_process_locations.txt in the same directory. The file will have the following format:
+
+process_name: process_exe | Parent: parent_name: parent_exe
+For example:
+
+System Idle Process: None | Parent: None: None
+System: None | Parent: None: None
+Registry: None | Parent: System: None
+smss.exe: C:\Windows\System32\smss.exe | Parent: System: None
+csrss.exe: C:\Windows\System32\csrss.exe | Parent: smss.exe: C:\Windows\System32\smss.exe
+wininit.exe: C:\Windows\System32\wininit.exe | Parent: smss.exe: C:\Windows\System32\smss.exe
+...
+Contributing
+Contributions are welcome! If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
+License
+This project is licensed under the MIT License.
