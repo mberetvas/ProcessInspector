@@ -28,7 +28,7 @@ Make sure you have Python 3.x installed on your system.
     ```shell
     python process_location_finder.py
 
-The script will retrieve the list of running processes and their file locations.
+The script will retrieve the list of running processes and their file locations, this list will be saved as a text file in the same folder as the script is located.
 
 ### Contributing
 
