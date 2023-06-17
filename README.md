@@ -27,7 +27,7 @@ The script will continuously monitor the running processes, update the process l
 
 ## Output
 
-The script generates a file named `running_process_locations.<format>` in the specified output folder. The format can be `csv`, `json`, or `xml`, depending on the chosen format. The file contains information about the running processes, including their names, locations, parent processes, and activation time.
+The script generates a file named `running_processes.<format>` in the specified output folder. The format can be `csv`, `json`, or `xml`, depending on the chosen format. The file contains information about the running processes, including their names, locations, parent processes, and activation time.
 
 ## License
 

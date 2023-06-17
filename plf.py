@@ -88,13 +88,13 @@ def main(output_folder, format, interval, total_time):
         time.sleep(interval)
 
     if format == 'csv':
-        file_path = f"{output_folder}/running_process_locations.csv"
+        file_path = f"{output_folder}/running_processes.csv"
         save_process_locations_to_csv(file_path, process_locations)
     elif format == 'json':
-        file_path = f"{output_folder}/running_process_locations.json"
+        file_path = f"{output_folder}/running_processes.json"
         save_process_locations_to_json(file_path, process_locations)
     elif format == 'xml':
-        file_path = f"{output_folder}/running_process_locations.xml"
+        file_path = f"{output_folder}/running_processes.xml"
         save_process_locations_to_xml(file_path, process_locations)
 
 
