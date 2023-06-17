@@ -1,38 +1,43 @@
-# Process Location Finder
+```
+# Process Location Finder (PLF)
 
-This script allows you to retrieve a list of running processes on your system along with their corresponding file locations. It can be useful for analyzing and understanding the processes running on your computer.
+PLF is a script written in Python that retrieves information about running processes on a system, including their names, locations, and parent processes. It provides the ability to save this information in different formats such as CSV, JSON, and XML.
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+- Python 3.x
+- psutil library (`pip install psutil`)
 
-Make sure you have Python 3.x installed on your system.
+## Usage
 
-### Installation
+```shell
+python plf.py -o <output_folder> -f <format>
+```
 
-1. Clone this repository or download the script file `process_location_finder.py`.
+- `-o <output_folder>` (optional): Specify the output folder where the result file will be saved. If not provided, the file will be saved in the current directory.
+- `-f <format>`: Specify the output format. Choose one of the following options: `csv`, `json`, or `xml`.
 
-2. Install the required dependencies by running the following command:
+Example:
+```shell
+python plf.py -o /path/to/output/folder -f json
+```
 
-   ```shell
-   pip install psutil
+The script will retrieve the running process information and save it as a JSON file in the specified output folder.
 
-### Usage
+## Output
 
-1. Open a terminal or command prompt.
+The script generates a file named `running_process_locations.<format>` in the specified output folder. The format can be `csv`, `json`, or `xml`, depending on the chosen format.
 
-2. Navigate to the directory where the script file is located.
+## License
 
-3. Run the script using the following command:
+This project is licensed under the [MIT License](LICENSE).
 
-    ```shell
-    python process_location_finder.py
+## Acknowledgements
 
-The script will retrieve the list of running processes and their file locations, this list will be saved as a text file in the same folder as the script is located.
+PLF uses the `psutil` library for retrieving process information. More information about `psutil` can be found [here](https://github.com/giampaolo/psutil).
 
-### Contributing
+```
 
-Contributions are welcome! If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
+Make sure to include a `LICENSE` file in your repository containing the license text for your project.
 
-### License
-This project is licensed under the MIT License.
+Feel free to modify the README file according to your specific needs and add any additional sections or information you think is relevant.
