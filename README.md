@@ -34,5 +34,3 @@ This project is licensed under the [MIT License](LICENSE).
 ## Acknowledgements
 
 PLF uses the `psutil` library for retrieving process information. More information about `psutil` can be found [here](https://github.com/giampaolo/psutil).
-
-```
