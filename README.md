@@ -37,7 +37,3 @@ This project is licensed under the [MIT License](LICENSE).
 PLF uses the `psutil` library for retrieving process information. More information about `psutil` can be found [here](https://github.com/giampaolo/psutil).
 
 ```
-
-Make sure to include a `LICENSE` file in your repository containing the license text for your project.
-
-Feel free to modify the README file according to your specific needs and add any additional sections or information you think is relevant.
