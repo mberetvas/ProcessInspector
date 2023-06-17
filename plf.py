@@ -1,8 +1,10 @@
 import sys
+import os
 import csv
 import json
 import xml.etree.ElementTree as ET
 import psutil
+import argparse
 
 
 def get_process_locations():
@@ -66,23 +68,33 @@ def save_as_xml(file_path, process_locations):
     tree.write(file_path, encoding='utf-8', xml_declaration=True)
 
 
-def print_help():
-    print("")
-    print("---------------Process Location Finder---------------")
-    print("")
-    print("Usage: python plf.py <output_file_path> <output_format>")
-    print("Valid output formats: 'csv', 'json', 'xml'")
-    print("")
-    print("-----------------------------------------------------")
-    print("")
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        prog='plf.py', description='Process Location Finder')
+    parser.add_argument('-o', '--output-folder',
+                        metavar='<output_folder>', help='Specify the output folder')
+    parser.add_argument('-f', '--format', metavar='<format>',
+                        help="Specify the output format: 'csv', 'json', or 'xml'")
+    return parser.parse_args()
 
 
-# Usage examplels
-if len(sys.argv) == 2 and sys.argv[1] == '--help':
-    print_help()
-elif len(sys.argv) != 3:
-    print("Invalid number of arguments. Use '--help' for more information.")
+def print_help(parser):
+    parser.print_help()
+
+
+# Usage example
+args = parse_arguments()
+
+if args.format:
+    output_format = args.format.lower()
+    if output_format not in ['csv', 'json', 'xml']:
+        print("Invalid output format. Please choose 'csv', 'json', or 'xml'.")
+        sys.exit(1)
 else:
-    file_path = sys.argv[1]
-    output_format = sys.argv[2].lower()
-    save_process_locations(file_path, output_format)
+    print("Output format is required. Please specify 'csv', 'json', or 'xml'.")
+    sys.exit(1)
+
+output_folder = args.output_folder if args.output_folder else os.getcwd()
+file_name = f'running_process_locations.{output_format}'
+file_path = os.path.join(output_folder, file_name)
+save_process_locations(file_path, output_format)
