@@ -1,4 +1,3 @@
-```
 # Process Location Finder (PLF)
 
 PLF is a script written in Python that retrieves information about running processes on a system, including their names, locations, and parent processes. It provides the ability to save this information in different formats such as CSV, JSON, and XML.
