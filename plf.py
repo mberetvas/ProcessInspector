@@ -24,6 +24,19 @@ def get_process_locations():
             else:  # if there is no parent process, use None values
                 parent_name = None
                 parent_exe = None
+
+            # Get network connections
+            connections = []
+            for conn in proc.connections():
+                connections.append({
+                    'fd': conn.fd,
+                    'family': str(conn.family),
+                    'type': str(conn.type),
+                    'local_address': conn.laddr,
+                    'remote_address': conn.raddr,
+                    'status': conn.status
+                })
+
             process_locations.append({
                 'name': process_name,
                 'exe': process_exe,
@@ -31,7 +44,8 @@ def get_process_locations():
                 'parent': {
                     'name': parent_name,
                     'exe': parent_exe
-                }
+                },
+                'connections': connections  # Add connections to the process info
             })
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
